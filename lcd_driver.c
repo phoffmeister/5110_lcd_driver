@@ -60,6 +60,7 @@ void lcd_write_string(uint8_t pixel[][6], uint8_t col, uint8_t row , char *text)
 		pixel[(col*6)+p+4][row] = lcd_letters[text[n]-'A'][4];
 		pixel[(col*6)+p+5][row] = 0x00;
 		p+=6;
+		n++;
 	}
 }
 
