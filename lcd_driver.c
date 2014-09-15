@@ -1,23 +1,68 @@
 /*TODO
  */
-
+#include <string.h>
 #include <avr/io.h>
 #include "lcd_driver.h"
 
 //numbers
-uint8_t lcd_num[10][3] = {{0x7C, 0x44, 0x7C},//0
-						  {0x00, 0x20, 0x7C},//1
-						  {0x5C, 0x54, 0x74},//2
-						  {0x44, 0x54, 0x7C},//3
-						  {0x70, 0x1C, 0x10},//4
-						  {0x74, 0x54, 0x5C},//5
-						  {0x7C, 0x54, 0x5C},//6
-						  {0x40, 0x50, 0x7C},//7
-						  {0x7C, 0x54, 0x7C},//8
-						  {0x74, 0x54, 0x7C},//9
-						};
+uint8_t lcd_num[10][3];
+
+void lcd_init_nums()
+{
+	lcd_num[0][0] = 0x7C;
+	lcd_num[0][1] = 0x44;
+	lcd_num[0][2] = 0x7C;
+	
+	lcd_num[1][0] = 0x00;
+	lcd_num[1][1] = 0x08;
+	lcd_num[1][2] = 0x7C;
+	
+	lcd_num[2][0] = 0x74;
+	lcd_num[2][1] = 0x54;
+	lcd_num[2][2] = 0x5C;
+	
+	lcd_num[3][0] = 0x44;
+	lcd_num[3][1] = 0x54;
+	lcd_num[3][2] = 0x7C;
+	
+	lcd_num[4][0] = 0x1C;
+	lcd_num[4][1] = 0x70;
+	lcd_num[4][2] = 0x10;
+
+	lcd_num[5][0] = 0x5C;
+	lcd_num[5][1] = 0x54;
+	lcd_num[5][2] = 0x74;
+	
+	lcd_num[6][0] = 0x7C;
+	lcd_num[6][1] = 0x54;
+	lcd_num[6][2] = 0x74;
+	
+	lcd_num[7][0] = 0x0C;
+	lcd_num[7][1] = 0x24;
+	lcd_num[7][2] = 0x7C;
+	
+	lcd_num[8][0] = 0x7C;
+	lcd_num[8][1] = 0x54;
+	lcd_num[8][2] = 0x7C;
+	
+	lcd_num[9][0] = 0x5C;
+	lcd_num[9][1] = 0x54;
+	lcd_num[9][2] = 0x7C;
+}
+
 //letters
-uint8_t lcd_letters[26][5] = { {0x00, 0x7C, 0x48, 0x7C, 0x00},//a
+uint8_t lcd_letters[26][5];
+
+void lcd_init_letter()
+{
+	lcd_letters[0][0]= 0x00;
+	lcd_letters[0][1]= 0x7C;
+	lcd_letters[0][2]= 0x24;
+	lcd_letters[0][3]= 0x7C;
+	lcd_letters[0][4]= 0x00;
+}
+/*
+	 = { {0x00, 0x7C, 0x48, 0x7C, 0x00},//a
 							   {0x00, 0x7C, 0x54, 0x74, 0x1C},//b
 							   {0x00, 0x7C, 0x44, 0x44, 0x00},//c
 							   {0x44, 0x7C, 0x44, 0x6C, 0x38},//d
@@ -44,35 +89,38 @@ uint8_t lcd_letters[26][5] = { {0x00, 0x7C, 0x48, 0x7C, 0x00},//a
 							   {0x40, 0x20, 0x1C, 0x20, 0x40},//y
 							   {0x4C, 0x54, 0x54, 0x54, 0x64},//z
 							 };
+*/
 
-void lcd_write_string(uint8_t pixel[][6], uint8_t col, uint8_t row , char *text)
+void lcd_write_string(uint8_t pixel[][6], uint8_t col, uint8_t row , char* text)
 {
 	//UPPER CASE ONLY!!!
-	uint8_t n,p;
+	uint8_t n,p,len;
 	n=0;
 	p=0;
-	while(text[n] && (p+5+(col*6)) < 84)
+	len = strlen(text);
+	lcd_write_num(pixel, 5,4,*text);
+	for(n=0;n<len; n++)
 	{
-		pixel[(col*6)+p  ][row] = lcd_letters[text[n]-'A'][0];
-		pixel[(col*6)+p+1][row] = lcd_letters[text[n]-'A'][1];
-		pixel[(col*6)+p+2][row] = lcd_letters[text[n]-'A'][2];
-		pixel[(col*6)+p+3][row] = lcd_letters[text[n]-'A'][3];
-		pixel[(col*6)+p+4][row] = lcd_letters[text[n]-'A'][4];
+		pixel[(col*6)+p  ][row] = lcd_letters[0][0];
+		pixel[(col*6)+p+1][row] = lcd_letters[0][1];
+		pixel[(col*6)+p+2][row] = lcd_letters[0][2];
+		pixel[(col*6)+p+3][row] = lcd_letters[0][3];
+		pixel[(col*6)+p+4][row] = lcd_letters[0][4];
 		pixel[(col*6)+p+5][row] = 0x00;
 		p+=6;
-		n++;
 	}
 }
 
 void lcd_write_num(uint8_t pixel[][6], uint8_t col, uint8_t row ,uint32_t num)
 {
-	uint8_t nums[32];
-	uint8_t n,p;
+	uint8_t nums[10];
+	int8_t n,p;
 	
-	for(n=0; n<32; n++){
+	for(n=0; n<10; n++){
 		nums[n] = num%10;
 		num/=10;
 	}
+	n=9;
 	while(nums[n]==0)
 	{
 		n--;
@@ -104,29 +152,9 @@ delayloop16 (unsigned int count)
 }
 
 void inline lcd_sendComand(uint8_t cmd)
-{
-	/*uint8_t n;
-	
-	// not chip enable -> low
-	LCD_PORT &= ~(1<<LCD_CE);
-	
+{	
 	//send data -> low
-	LCD_PORT &= ~(1<<LCD_SEND_DATA);
-	
-	for( n=0; n<8; n++)
-	{
-		LCD_PORT &= ~(1<<LCD_CLK);
-		if( ((128>>n) & cmd) > 0)
-			LCD_PORT |= (1<<LCD_DI);
-		else
-			LCD_PORT &= ~(1<<LCD_DI);
-		delayloop16(LCD_SEND_DELAY);
-		LCD_PORT |= (1<<LCD_CLK);
-		delayloop16(LCD_SEND_DELAY);	
-	}*/
-	
-	//send data -> low
-	LCD_PORT &= ~(1<<LCD_SEND_DATA);
+	LCD_PORT &= ~(1<<LCD_SEND_DATA);	
 	
 	SPDR = cmd;
 	while(!(SPSR & (1<<SPIF)));
@@ -134,30 +162,10 @@ void inline lcd_sendComand(uint8_t cmd)
 
 void inline __attribute__((always_inline)) lcd_sendData(uint8_t data)
 {
-	/*
-	uint8_t n;
-	
-	// not chip enable -> low
-	LCD_PORT &= ~(1<<LCD_CE);
-	
 	//send data -> high
+
 	LCD_PORT |= (1<<LCD_SEND_DATA);
 	
-	
-	for( n=0; n<8; n++)
-	{
-		LCD_PORT &= ~(1<<LCD_CLK);
-		if( ((128>>n) & data) > 0)
-			LCD_PORT |= (1<<LCD_DI);
-		else
-			LCD_PORT &= ~(1<<LCD_DI);
-		delayloop16(LCD_SEND_DELAY);
-		LCD_PORT |= (1<<LCD_CLK);
-		delayloop16(LCD_SEND_DELAY);
-	}
-	*/
-	//send data -> high
-	LCD_PORT |= (1<<LCD_SEND_DATA);
 	
 	SPDR = data;
 	while(!(SPSR & (1<<SPIF)));
@@ -168,6 +176,7 @@ void lcd_reset()
 	LCD_PORT &= ~(1<<LCD_RES);
 	_delay_ms(LCD_RES_TIME);
 	LCD_PORT |= (1<<LCD_RES);
+	_delay_ms(LCD_RES_TIME);
 }
 
 void lcd_setup()
@@ -177,16 +186,21 @@ void lcd_setup()
 	
 	LCD_PORT &= ~( (1<<LCD_CLK) | (1<<LCD_DI) | (1<<LCD_RES) | (1<<LCD_CE) | (1<<LCD_SEND_DATA) );
 	
-	SPCR = (1<<SPE) | (1<<CPOL) | (1<<CPHA) | (1<<MSTR) | (1<<SPR0);
+	
+	SPCR = (1<<SPE) | (1<<CPOL) | (1<<CPHA) | (1<<MSTR) | (1<<SPR0);// | (1<<SPR1);
 	
 	lcd_reset();
-	//init with no power down, vertical addressing, basic instruction set
-	//-> 0b00100010 -> 0x22
-	lcd_sendComand(0x22);
 	
-	//put lcd in normal mode
-	//-> 0b00001100 -> 0x0c
-	lcd_sendComand(0x0c);
+	lcd_sendComand(0x21);
+	lcd_sendComand(0xB8);
+	lcd_sendComand(0x04);
+	lcd_sendComand(0x14);
+	lcd_sendComand(0x20);
+	lcd_sendComand(0x0C);
+	
+	lcd_init_nums();
+	lcd_init_letter();
+	
 }
 
 
@@ -260,16 +274,18 @@ void lcd_fillAlternating(uint8_t pixel[][6])
 
 void main()
 {
+
 	lcd_setup();
-	
+	uint8_t n,p;
 	uint8_t pixel[84][6];
-	lcd_fillAlternating(pixel);
-	//lcd_clearAll(pixel);
-	while(1)
-	{	
-		lcd_updateDisplay(pixel);
-		_delay_ms(500);
-		//lcd_invert(pixel);
-	}	
+	lcd_clearAll(pixel);
+
+	lcd_write_num(pixel, 0,0, 1337);
+	lcd_write_num(pixel, 0,1,1234567890);
+	lcd_write_num(pixel,0,2,28);
+	lcd_write_num(pixel,3,2,3);
+	lcd_write_num(pixel,5,2,1987);
+	lcd_updateDisplay(pixel);
+
 }
 
