@@ -94,12 +94,24 @@ void inline lcd_write_string(uint8_t pixel[][6], uint8_t col, uint8_t row , uint
 	p=0;
 	while(*text)
 	{
-		pixel[(col*6)+p  ][row] = lcd_letters[*text-'A'][0];
-		pixel[(col*6)+p+1][row] = lcd_letters[*text-'A'][1];
-		pixel[(col*6)+p+2][row] = lcd_letters[*text-'A'][2];
-		pixel[(col*6)+p+3][row] = lcd_letters[*text-'A'][3];
-		pixel[(col*6)+p+4][row] = lcd_letters[*text-'A'][4];
-		pixel[(col*6)+p+5][row] = 0x00;
+		if(*text==' ')
+		{
+			pixel[(col*6)+p  ][row] = 0x00;
+			pixel[(col*6)+p+1][row] = 0x00;
+			pixel[(col*6)+p+2][row] = 0x00;
+			pixel[(col*6)+p+3][row] = 0x00;
+			pixel[(col*6)+p+4][row] = 0x00;
+			pixel[(col*6)+p+5][row] = 0x00;
+		}
+		else
+		{
+			pixel[(col*6)+p  ][row] = lcd_letters[*text-'A'][0];
+			pixel[(col*6)+p+1][row] = lcd_letters[*text-'A'][1];
+			pixel[(col*6)+p+2][row] = lcd_letters[*text-'A'][2];
+			pixel[(col*6)+p+3][row] = lcd_letters[*text-'A'][3];
+			pixel[(col*6)+p+4][row] = lcd_letters[*text-'A'][4];
+			pixel[(col*6)+p+5][row] = 0x00;			
+		}
 		p+=6;
 		text++;
 	}
@@ -277,6 +289,7 @@ void main()
 	lcd_write_num(pixel, 0,1,1234567890);
 	lcd_write_string(pixel, 0, 3, "ABCDEFGHIJKLM");
 	lcd_write_string(pixel, 0, 4, "NOPQRSTUVWXYZ");
+	lcd_invert(pixel);
 	lcd_updateDisplay(pixel);
 
 }
