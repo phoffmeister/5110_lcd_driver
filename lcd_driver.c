@@ -92,7 +92,6 @@ void inline lcd_write_string(uint8_t pixel[][6], uint8_t col, uint8_t row , uint
 	uint8_t n,p;
 	n=0;
 	p=0;
-	//lcd_write_num(pixel,5,5,text);
 	while(*text)
 	{
 		pixel[(col*6)+p  ][row] = lcd_letters[*text-'A'][0];
@@ -106,7 +105,7 @@ void inline lcd_write_string(uint8_t pixel[][6], uint8_t col, uint8_t row , uint
 	}
 }
 
-void lcd_write_num(uint8_t pixel[][6], uint8_t col, uint8_t row ,uint32_t num)
+void inline lcd_write_num(uint8_t pixel[][6], uint8_t col, uint8_t row ,uint32_t num)
 {
 	uint8_t nums[10];
 	int8_t n,p;
