@@ -277,7 +277,7 @@ void lcd_fillAlternating(uint8_t pixel[][6])
 	}
 }
 
-
+/*
 void main()
 {
 
@@ -293,4 +293,4 @@ void main()
 	lcd_updateDisplay(pixel);
 
 }
-
+*/
